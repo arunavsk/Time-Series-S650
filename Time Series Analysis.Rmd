@@ -1,6 +1,7 @@
 ---
-title: "Assignment 4"
-output: html_notebook
+title: "Electricity Demand Forecasting"
+author: "Arunav Saikia"
+output: github_document
 ---
 
 Load Data
