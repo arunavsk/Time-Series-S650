@@ -1,0 +1,119 @@
+---
+title: "Assignment 4"
+output: html_notebook
+---
+
+Load Data
+```{r}
+library(fpp2)
+library(stats)
+library(polyreg)
+plot(elecdaily)
+# plot(elecdemand)
+```
+```{r}
+data <- data.frame(elecdaily)
+# data <- data.frame(elecdemand)
+demand <- data$Demand - mean(data$Demand)
+temp <- data$Temperature - mean(data$Temperature)
+
+N = 365
+T1 = 1:N
+T1 = (T1 - mean(T1))/sd(T1) #normalize for numerical stability
+
+aic_demand = c()
+for (val in c(1:20)) {
+     aic_demand[val] = AIC(lm(demand~poly(T1,val)))
+}
+plot(aic_demand, type = 'l', main = 'AIC vs degree of polynomial', xlab = 'degree')
+
+aic_temp = c()
+for (val in c(1:20)) {
+     aic_temp[val] = AIC(lm(temp~poly(T1,val)))
+}
+plot(aic_temp, type = 'l', main = 'AIC vs degree of polynomial', xlab = 'degree')
+```
+```{r}
+res_demand = lm(demand~poly(T1,6))
+summary(res_demand)
+demandR = residuals(res_demand)
+plot(demandR, main='residuals')
+
+demandR_filtered = filter(demandR^2, rep(1/10,10), sides = 2)
+plot(demandR_filtered, main = 'variance')
+```
+```{r}
+res_temp = lm(temp~poly(T1,4))
+summary(res_temp)
+tempR = residuals(res_temp)
+plot(tempR, main='residuals')
+
+tempR_filtered = filter(tempR^2, rep(1/10,10), sides = 2)
+plot(tempR_filtered, main = 'variance')
+```
+
+Look for periodic trends
+```{r}
+# demandper = spec.pgram(demand,spans=c(25,25),taper=0,log="no")
+demandRper = spec.pgram(demandR,spans=c(25,25),taper=0,log="no")
+tempRper = spec.pgram(tempR,spans=c(25,25),taper=0,log="no")
+
+#.1440,.2853
+f1 = .1428571
+f2 = .2857143
+time = 1:N
+cos1 = cos(2*pi*time*f1)
+sin1 = sin(2*pi*time*f1)
+cos2 = cos(2*pi*time*f2)
+sin2 = sin(2*pi*time*f2)
+
+f3 = .1706667
+cos3 = cos(2*pi*time*f3)
+sin3 = sin(2*pi*time*f3)
+# aic = c()
+# for (val in c(1:20)) {
+#      aic[val] = AIC(lm(demand~poly(T1,val)+cos1+sin1+cos2+sin2))
+# }
+# plot(aic, type = 'l', main = 'AIC vs degree of polynomial', xlab = 'degree')
+
+```
+```{r}
+res_demand_new = lm(demand~poly(T1,6)+cos1+sin1+cos2+sin2)
+summary(res_demand_new)
+demandR_new = residuals(res_demand_new)
+plot(demandR_new, main='residuals')
+
+
+plot(filter(demandR_new^2, rep(1/10,10), sides = 1), main = 'variance')
+demandR_new_per = spec.pgram(demandR_new,spans=c(50,50),taper=0,log="no")
+
+```
+```{r}
+res_temp_new = lm(temp~poly(T1,4)+cos3+sin3)
+summary(res_temp_new)
+tempR_new = residuals(res_temp_new)
+plot(tempR_new, main='residuals')
+
+
+plot(filter(tempR_new^2, rep(1/10,10), sides = 1), main = 'variance')
+tempR_new_per = spec.pgram(tempR_new,spans=c(50,50),taper=0,log="no")
+
+```
+
+
+```{r}
+# acf(demandR, 50, main="Demand")
+# pacf(demandR, 50, main="Demand")
+
+acf(demandR_new, 50, main="Demand")
+acf(tempR_new, 50, main="Temperature")
+# pacf(demandR_new, 50, main="Demand")
+
+```
+```{r}
+AH = cbind(demandR_new,tempR_new)
+
+ # spectrum(AH,log="no")
+ H = spectrum(AH,spans=c(20,20),taper=0,log="no",plot=FALSE)
+ plot(H$freq,H$coh,type="l",xlab="freq")
+```
