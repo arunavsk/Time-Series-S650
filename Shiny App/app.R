@@ -1,0 +1,57 @@
+library(shiny)
+ui <- fluidPage(
+  titlePanel("Understanding Noise Processes", windowTitle = 'Understanding Noise Processes'),
+  'What the app is about',
+  sidebarLayout(
+    sidebarPanel(
+      numericInput('p', '# AR components (p)',value = 1, min = 0),
+      numericInput('q', '# MA components (q)',value = 1, min = 0),
+      uiOutput("ARCoeff"),
+      uiOutput("MACoeff"),
+      radioButtons("typeInput", "Time Domain/Frequency Domain",
+                   choices = c("Time Domain", "Frequency Domain"),
+                   selected = "Time Domain")
+                 ),
+    mainPanel(
+      plotOutput("TS"),
+      br(),br(),
+      plotOutput("acf"))
+  )
+)
+server <- function(input, output) {
+  output$ARCoeff <- renderUI({
+    lapply(1:input$p, function(i) {
+      numericInput(paste('alpha',i,sep=''), paste('alpha',i) ,value = 0.5, min = 0)
+    })
+  })
+  
+  output$MACoeff <- renderUI({
+    lapply(1:input$q, function(i) {
+      numericInput(paste('beta',i,sep=''), paste('beta',i) ,value = 0.5, min = 0)
+    })
+  })
+  
+  arcoeff <- reactive({
+    vec1 = c()
+    lapply(1:input$p, function(i) {
+      vec1[i]<- paste0('input.beta',i)
+    })
+    print(vec1)
+    return(vec1)
+  })
+  TSdata  <- reactive({
+    arima.sim(n = 100, model = list(order = c(input$p, input$q, 0), 
+                                    ar = input$alpha1,
+                                    ma = input$beta1,
+                                    sd = 0.1))
+  })
+  
+  output$TS <- renderPlot({
+    plot(TSdata(), type = 'l')
+  })
+  
+  output$acf <- renderPlot({
+  acf(TSdata(), 20)
+  })
+  }
+shinyApp(ui = ui, server = server)
