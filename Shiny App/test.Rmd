@@ -1,3 +1,13 @@
+---
+title: "Untitled"
+runtime: shiny
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r, echo=FALSE}
 library(shiny)
 library(shinythemes)
 ui <- fluidPage(
@@ -66,3 +76,6 @@ server <- function(input, output) {
   })
   }
 shinyApp(ui = ui, server = server)
+
+```
+
