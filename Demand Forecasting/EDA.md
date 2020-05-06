@@ -1,8 +1,12 @@
-Electricity Demand Forecasting
+Electricity Demand Forecasting - EDA
 ================
 Arunav Saikia
 
+<h3>
+
 Load Data
+
+</h3>
 
 ``` r
 library(fpp2)
@@ -23,21 +27,36 @@ library(fpp2)
 ``` r
 library(stats)
 library(polyreg)
-plot(elecdaily)
-```
-
-![](Time-Series-Analysis_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
-
-``` r
+# plot(elecdaily)
 # plot(elecdemand)
 ```
+
+<h3>
+
+Data Analysis
+
+</h3>
 
 ``` r
 data <- data.frame(elecdaily)
 # data <- data.frame(elecdemand)
+plot(data$Demand, type = 'l', main = 'Electricity Demand', xlab = 'Day of Year', ylab = 'Demand (GW)')
+```
+
+![](EDA_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+
+``` r
+plot(data$Temperature, type = 'l', main = 'Max Temperatures', xlab = 'Day of Year', ylab = 'Temperature (C)')
+```
+
+![](EDA_files/figure-gfm/unnamed-chunk-2-2.png)<!-- -->
+
+``` r
 demand <- data$Demand - mean(data$Demand)
 temp <- data$Temperature - mean(data$Temperature)
+```
 
+``` r
 N = 365
 T1 = 1:N
 T1 = (T1 - mean(T1))/sd(T1) #normalize for numerical stability
@@ -49,7 +68,7 @@ for (val in c(1:20)) {
 plot(aic_demand, type = 'l', main = 'AIC vs degree of polynomial', xlab = 'degree')
 ```
 
-![](Time-Series-Analysis_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+![](EDA_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 ``` r
 aic_temp = c()
@@ -59,7 +78,7 @@ for (val in c(1:20)) {
 plot(aic_temp, type = 'l', main = 'AIC vs degree of polynomial', xlab = 'degree')
 ```
 
-![](Time-Series-Analysis_files/figure-gfm/unnamed-chunk-2-2.png)<!-- -->
+![](EDA_files/figure-gfm/unnamed-chunk-3-2.png)<!-- -->
 
 ``` r
 res_demand = lm(demand~poly(T1,6))
@@ -95,14 +114,14 @@ demandR = residuals(res_demand)
 plot(demandR, main='residuals')
 ```
 
-![](Time-Series-Analysis_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](EDA_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
 demandR_filtered = filter(demandR^2, rep(1/10,10), sides = 2)
 plot(demandR_filtered, main = 'variance')
 ```
 
-![](Time-Series-Analysis_files/figure-gfm/unnamed-chunk-3-2.png)<!-- -->
+![](EDA_files/figure-gfm/unnamed-chunk-4-2.png)<!-- -->
 
 ``` r
 res_temp = lm(temp~poly(T1,4))
@@ -136,14 +155,14 @@ tempR = residuals(res_temp)
 plot(tempR, main='residuals')
 ```
 
-![](Time-Series-Analysis_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](EDA_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
 tempR_filtered = filter(tempR^2, rep(1/10,10), sides = 2)
 plot(tempR_filtered, main = 'variance')
 ```
 
-![](Time-Series-Analysis_files/figure-gfm/unnamed-chunk-4-2.png)<!-- -->
+![](EDA_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->
 
 Look for periodic trends
 
@@ -152,13 +171,13 @@ Look for periodic trends
 demandRper = spec.pgram(demandR,spans=c(25,25),taper=0,log="no")
 ```
 
-![](Time-Series-Analysis_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](EDA_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
 tempRper = spec.pgram(tempR,spans=c(25,25),taper=0,log="no")
 ```
 
-![](Time-Series-Analysis_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->
+![](EDA_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->
 
 ``` r
 #.1440,.2853
@@ -218,19 +237,19 @@ demandR_new = residuals(res_demand_new)
 plot(demandR_new, main='residuals')
 ```
 
-![](Time-Series-Analysis_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](EDA_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
 plot(filter(demandR_new^2, rep(1/10,10), sides = 1), main = 'variance')
 ```
 
-![](Time-Series-Analysis_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->
+![](EDA_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
 
 ``` r
 demandR_new_per = spec.pgram(demandR_new,spans=c(50,50),taper=0,log="no")
 ```
 
-![](Time-Series-Analysis_files/figure-gfm/unnamed-chunk-6-3.png)<!-- -->
+![](EDA_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->
 
 ``` r
 res_temp_new = lm(temp~poly(T1,4)+cos3+sin3)
@@ -266,45 +285,51 @@ tempR_new = residuals(res_temp_new)
 plot(tempR_new, main='residuals')
 ```
 
-![](Time-Series-Analysis_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](EDA_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ``` r
 plot(filter(tempR_new^2, rep(1/10,10), sides = 1), main = 'variance')
 ```
 
-![](Time-Series-Analysis_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
+![](EDA_files/figure-gfm/unnamed-chunk-8-2.png)<!-- -->
 
 ``` r
 tempR_new_per = spec.pgram(tempR_new,spans=c(50,50),taper=0,log="no")
 ```
 
-![](Time-Series-Analysis_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->
+![](EDA_files/figure-gfm/unnamed-chunk-8-3.png)<!-- -->
 
 ``` r
 # acf(demandR, 50, main="Demand")
 # pacf(demandR, 50, main="Demand")
 
-acf(demandR_new, 50, main="Demand")
+acf(demandR_new, 50, main = '')
 ```
 
-![](Time-Series-Analysis_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](EDA_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
-acf(tempR_new, 50, main="Temperature")
+acf(tempR_new, 50, main = '')
 ```
 
-![](Time-Series-Analysis_files/figure-gfm/unnamed-chunk-8-2.png)<!-- -->
+![](EDA_files/figure-gfm/unnamed-chunk-9-2.png)<!-- -->
 
 ``` r
 # pacf(demandR_new, 50, main="Demand")
 ```
 
 ``` r
-AH = cbind(demandR_new,tempR_new)
+ccf(demandR_new, tempR_new, main = '')
+```
+
+![](EDA_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+``` r
+AH = cbind(tempR_new, demandR_new)
 
  # spectrum(AH,log="no")
  H = spectrum(AH,spans=c(20,20),taper=0,log="no",plot=FALSE)
  plot(H$freq,H$coh,type="l",xlab="freq")
 ```
 
-![](Time-Series-Analysis_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](EDA_files/figure-gfm/unnamed-chunk-10-2.png)<!-- -->

@@ -1,23 +1,28 @@
 ---
-title: "Electricity Demand Forecasting"
+title: "Electricity Demand Forecasting - EDA"
 author: "Arunav Saikia"
 output: github_document
 ---
 
-Load Data
+<h3>Load Data</h3>
 ```{r}
 library(fpp2)
 library(stats)
 library(polyreg)
-plot(elecdaily)
+# plot(elecdaily)
 # plot(elecdemand)
 ```
+<h3>Data Analysis </h3>
 ```{r}
 data <- data.frame(elecdaily)
 # data <- data.frame(elecdemand)
+plot(data$Demand, type = 'l', main = 'Electricity Demand', xlab = 'Day of Year', ylab = 'Demand (GW)')
+plot(data$Temperature, type = 'l', main = 'Max Temperatures', xlab = 'Day of Year', ylab = 'Temperature (C)')
 demand <- data$Demand - mean(data$Demand)
 temp <- data$Temperature - mean(data$Temperature)
 
+```
+```{r}
 N = 365
 T1 = 1:N
 T1 = (T1 - mean(T1))/sd(T1) #normalize for numerical stability
@@ -106,13 +111,14 @@ tempR_new_per = spec.pgram(tempR_new,spans=c(50,50),taper=0,log="no")
 # acf(demandR, 50, main="Demand")
 # pacf(demandR, 50, main="Demand")
 
-acf(demandR_new, 50, main="Demand")
-acf(tempR_new, 50, main="Temperature")
+acf(demandR_new, 50, main = '')
+acf(tempR_new, 50, main = '')
 # pacf(demandR_new, 50, main="Demand")
 
 ```
 ```{r}
-AH = cbind(demandR_new,tempR_new)
+ccf(demandR_new, tempR_new, main = '')
+AH = cbind(tempR_new, demandR_new)
 
  # spectrum(AH,log="no")
  H = spectrum(AH,spans=c(20,20),taper=0,log="no",plot=FALSE)
