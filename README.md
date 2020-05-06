@@ -5,7 +5,7 @@ Electricity demand forecasting is an essential tool for energy management, maint
 
 Read this [writeup](Documents/Mid_Term_Electricity_Demand_Forecasting.pdf) for more info
 ## How-To
-Head over to [Demand Forecasting](Demand Forecasting/) and explore the notebooks
+Head over to [Demand Forecasting](Demand%20Forecasting/) and explore the notebooks
 
 ## Future Work
 1. Add holiday and weekday data
