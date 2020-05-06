@@ -1,8 +1,8 @@
 ---
-title: "Assignment-6"
-output:
-  html_document: default
-  pdf_document: default
+title: "Electricity Demand Forecasting - ARIMA"
+author: "Arunav Saikia"
+output: 
+  github_document: default
 ---
 
 <h3> Load Data </h3>
